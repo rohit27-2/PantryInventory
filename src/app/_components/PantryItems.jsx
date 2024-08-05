@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react'
 import { doc, getDocs, collection, setDoc, deleteDoc, getDoc } from 'firebase/firestore'
 import { db } from '../../../firebase'
+import { toast } from 'sonner'
 
 function PantryItems() {
     const [pantryItems, setPantryItems] = useState([])
@@ -38,6 +39,7 @@ function PantryItems() {
             if (docSnap.exists()) {
                 const { quantity } = docSnap.data()
                 await setDoc(docRef, { quantity: quantity + 1 })
+
             } else {
                 await setDoc(docRef, { quantity: 1 })
             }
@@ -75,7 +77,7 @@ function PantryItems() {
 
     return (
         <div className="flex flex-col justify-center items-center min-h-screen">
-            {/* Modal for Adding Items */}
+            <h1 className="text-4xl font-bold mb-8">Inventory Management Application</h1>    
             {open && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
                     <div className="bg-white rounded-lg p-8">
@@ -90,6 +92,13 @@ function PantryItems() {
                             />
                             <button
                                 onClick={() => {
+                                    toast.success("Item Added ", {
+                                        description: "You have successfully added an item to your pantry",
+                                        action: {
+                                            label: "X",
+                                            onClick: () => console.log("Undo"),
+                                        },
+                                    })
                                     addItem(itemName)
                                     setItemName('')
                                     handleClose()
@@ -125,7 +134,23 @@ function PantryItems() {
                                     <span className="text-xl">{name.charAt(0).toUpperCase() + name.slice(1)}</span>
                                     <span className="text-xl">Quantity: {quantity}</span>
                                     <button
-                                        onClick={() => removeItem(name)}
+                                        onClick={() => {
+                                            toast.error("Item Removed ", {
+                                                description: "You have successfully removed an item from your pantry",
+                                                classNames: {
+                                                    toast: 'bg-red-400',
+                                                    title: 'text-white-400 ',
+                                                    
+                                                },
+                                                action: {
+                                                    label: "X",
+                                                    onClick: () => console.log("Undo"),
+                                                },
+                                            })
+                                            removeItem(name)
+                                        }
+
+                                        }
                                         className="bg-red-500 text-white px-4 py-2 rounded-md"
                                     >
                                         Remove
@@ -139,8 +164,8 @@ function PantryItems() {
             <div className="fixed inset-x-0 bottom-0 p-4">
                 <div className="rounded-lg bg-indigo-600 px-4 py-3 text-white shadow-lg">
                     <p className="text-center text-sm font-medium">
-                        Loving the Beta Version? 
-                        <a href="#" className="inline-block underline"> Join the waitlist to unlock new features </a>
+                        Loving the Beta Version?
+                        <a href="#" className="inline-block underline"> Join the waitlist to get notified </a>
                     </p>
                 </div>
             </div>
